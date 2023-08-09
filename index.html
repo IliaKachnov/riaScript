@@ -4,23 +4,26 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@300;400&display=swap"
+      rel="stylesheet"
+    />
     <title>RIA script</title>
     <style>
       html {
         height: 100vh;
       }
       body {
-        font-family: 'Roboto Flex', sans-serif;
+        font-family: "Roboto Flex", sans-serif;
         margin: 0;
         padding: 0;
         height: 100%;
       }
       p {
         margin: 0;
-        padding: 0; 
+        padding: 0;
       }
       .scroll {
         display: none;
@@ -29,14 +32,14 @@
         display: none;
       }
       .animate-scroll-top {
-        transition: transform 0.3s ease; 
+        transition: transform 0.3s ease;
       }
       @media (max-width: 768px) {
         .scroll {
           display: block;
           position: fixed;
           bottom: -820px;
-          left: 0; 
+          left: 0;
           width: 100%;
           height: 900px;
           z-index: 2;
@@ -61,7 +64,7 @@
           outline: none;
           border: none;
         }
-       
+
         .scroll.top {
           position: fixed;
           width: 100%;
@@ -100,26 +103,32 @@
           max-width: 560px;
           text-decoration: none;
         }
-        .lenta__wrapper {
+        .lenta__container {
           display: flex;
-          justify-content: space-between;
+          justify-content: stretch;
           align-items: center;
           padding: 0 20px;
           padding-top: 15px;
           padding-bottom: 10px;
           box-shadow: rgba(33, 35, 38, 0.2) 0px 10px 10px -10px;
         }
-        .lenta__wrapper.hide {
+        .lenta__container.hide {
           display: none;
         }
         .lenta {
           color: #002981;
           font-size: 20px;
-          font-weight:bold;
+          font-weight: bold;
+          max-width: 500px;
+          width: 100%;
+          padding-right: 100px;
         }
         .cross {
           width: 25px;
           height: 25px;
+          position: absolute;
+          right: 5%;
+          z-index: 10;
         }
         .lentaMini__wrapper {
           display: flex;
@@ -129,7 +138,7 @@
           padding: 15px 15px 15px 16px;
           width: 180px;
           background-color: #fff;
-          box-shadow: 0 2px 8px rgba(0,0,0,.15);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
           border-radius: 10px;
           display: flex;
           justify-content: space-between;
@@ -151,6 +160,11 @@
           font-weight: bold;
         }
       }
+      @media (max-width: 415px) {
+        .scroll {
+          bottom: -810px;
+        }
+      }
       @media (max-width: 390px) {
         .scroll {
           bottom: -814px;
@@ -164,12 +178,13 @@
         <div class="line__wrapper">
           <span class="line"></span>
         </div>
-        <div class="lenta__wrapper hide">
-          <p class="lenta">Лента новостей</p>
-          <img class="cross" src="cross.png">
+        <div class="lenta__container">
+          <div class="lenta__wrapper hide">
+            <p class="lenta">Лента новостей</p>
+          </div>
+          <img class="cross" src="cross.png" />
         </div>
-        <div class="text__wrapper">
-        </div>
+        <div class="text__wrapper"></div>
       </div>
       <div class="lentaMini__wrapper">
         <p class="lentaMini">Лента новостей</p>
@@ -178,105 +193,168 @@
     </div>
   </body>
   <script>
-    const newsScrollContainer = document.querySelector('.scroll');
+    const newsScrollContainer = document.querySelector(".scroll");
     const line = document.querySelector(".line__wrapper");
     const textWrapper = document.querySelector(".text__wrapper");
-    const crossClose = document.querySelector('.cross');
-    const lentaWrapper = document.querySelector('.lenta__wrapper');
-    const lentaMiniWrapper = document.querySelector('.lentaMini__wrapper');
-    
+    const crossClose = document.querySelector(".cross");
+    const lentaContainer = document.querySelector(".lenta__container");
+    const lentaWrapper = document.querySelector(".lenta__wrapper");
 
+    const lentaMiniWrapper = document.querySelector(".lentaMini__wrapper");
+    const links = [];
     let isActive = false;
 
     function fetchAndDisplayNews() {
       fetch("https://6474014e7de100807b1a4b01.mockapi.io/ria")
-        .then(response => response.json())
-        .then(data => {
-          const parsedData = data[0]
+        .then((response) => response.json())
+        .then((data) => {
+          const parsedData = data[0];
           textWrapper.innerHTML = "";
-          if (parsedData.status === 'success') {
-            parsedData.news.forEach(arr => {
-              const textContainer = document.createElement('div');
-              textContainer.className = 'text__container';
+          if (parsedData.status === "success") {
+            parsedData.news.forEach((arr) => {
+              const textContainer = document.createElement("div");
+              textContainer.className = "text__container";
               textContainer.innerHTML = `
                 <p class="time">${arr.time_publish}</p>
-                <a href="${arr.url}" class="text" target="_blank">${arr.title}</a>
+                <a href="${arr.url}" class="text" target="_blank" style="pointer-events: none;">${arr.title}</a>
               `;
               textWrapper.appendChild(textContainer);
             });
           }
-          const firstElement = document.querySelector('.text__container:nth-child(1)');
-          line.addEventListener('click', () => {
-            newsScrollContainer.classList.toggle('top');
-            lentaWrapper.classList.toggle('hide');
-          })
-          
+          const lentaLink = document.querySelectorAll(".text");
+          const firstElement = document.querySelector(
+            ".text__container:nth-child(1)"
+          );
+          line.addEventListener("click", () => {
+            newsScrollContainer.classList.toggle("top");
+            lentaContainer.classList.toggle("hide");
+          });
 
-          crossClose.addEventListener('click', () => {
-            lentaMiniWrapper.classList.remove('hide')
-            newsScrollContainer.classList.add('hide')
-            newsScrollContainer.classList.remove('top');
-            document.body.style.overflow = 'auto';
-          })
+          crossClose.addEventListener("click", () => {
+            lentaMiniWrapper.classList.remove("hide");
+            newsScrollContainer.classList.add("hide");
+            newsScrollContainer.classList.remove("top");
+            document.body.style.overflow = "auto";
+            if (newsScrollContainer.classList.contains("top")) {
+              firstElement.removeEventListener("touchstart", touchStart);
+              firstElement.removeEventListener("touchmove", touchMove);
+              firstElement.removeEventListener("touchend", touchEnd);
+            } else {
+              firstElement.addEventListener("touchstart", touchStart);
+              firstElement.addEventListener("touchmove", touchMove);
+              firstElement.addEventListener("touchend", touchEnd);
+            }
+            setTimeout(() => {
+              lentaLink.forEach((link) => {
+              if (!newsScrollContainer.classList.contains("top")) {
+                link.style.pointerEvents = "none";
+              } else {
+                link.style.pointerEvents = "auto";
+              }
+            });
+            }, 100);
+          });
 
-          lentaMiniWrapper.addEventListener('click', () => {
-            lentaMiniWrapper.classList.add('hide')
-            newsScrollContainer.classList.remove('hide')
-            lentaWrapper.classList.add('hide');
-            newsScrollContainer.classList.remove('top')
-            document.body.style.overflow = 'auto';
-          })
+          lentaMiniWrapper.addEventListener("click", () => {
+            lentaMiniWrapper.classList.add("hide");
+            newsScrollContainer.classList.remove("hide");
+            lentaContainer.classList.add("hide");
+            newsScrollContainer.classList.remove("top");
+            document.body.style.overflow = "auto";
+          });
 
           line.addEventListener("touchstart", (e) => {
             startY = e.touches[0].clientY;
-            document.body.style.overflow = 'hidden';
-            document.body.style.touchAction = 'none';
+            document.body.style.overflow = "hidden";
+            document.body.style.touchAction = "none";
           });
-          
 
           line.addEventListener("touchmove", (e) => {
-              document.body.style.touchAction = 'none';
-              currentY = e.touches[0].clientY;
+            document.body.style.touchAction = "none";
+            currentY = e.touches[0].clientY;
             const diffY = currentY - startY;
-              newsScrollContainer.style.transform = `translateY(${diffY}px)`;
+            newsScrollContainer.style.transform = `translateY(${diffY}px)`;
           });
 
           line.addEventListener("touchend", () => {
             isActive = !isActive;
-            newsScrollContainer.classList.toggle('top');
-            lentaWrapper.classList.toggle('hide');
+            newsScrollContainer.classList.toggle("top");
+            lentaContainer.classList.toggle("hide");
             newsScrollContainer.style.transform = `translateY(0px)`;
-            if (!newsScrollContainer.classList.contains('top')) {
-            document.body.style.overflow = 'auto';
-          }
+            if (!newsScrollContainer.classList.contains("top")) {
+              document.body.style.overflow = "auto";
+            }
+            document.body.style.touchAction = "auto";
+            if (newsScrollContainer.classList.contains("top")) {
+              firstElement.removeEventListener("touchstart", touchStart);
+              firstElement.removeEventListener("touchmove", touchMove);
+              firstElement.removeEventListener("touchend", touchEnd);
+            } else {
+              firstElement.addEventListener("touchstart", touchStart);
+              firstElement.addEventListener("touchmove", touchMove);
+              firstElement.addEventListener("touchend", touchEnd);
+            }
+            
+            setTimeout(() => {
+              lentaLink.forEach((link) => {
+              if (!newsScrollContainer.classList.contains("top")) {
+                link.style.pointerEvents = "none";
+              } else {
+                link.style.pointerEvents = "auto";
+              }
+            });
+            }, 100);
           });
 
-
-          firstElement.addEventListener("touchstart", (e) => {
+          function touchStart(e) {
             startY = e.touches[0].clientY;
-            document.body.style.overflow = 'hidden';
-          });
-          
-
-          firstElement.addEventListener("touchmove", (e) => {
+            document.body.style.overflow = "hidden";
+          }
+          function touchMove(e) {
             currentY = e.touches[0].clientY;
             const diffY = currentY - startY;
 
-            if(diffY > 80 - window.screen.availHeight) {
+            if (diffY > 80 - window.screen.availHeight) {
               newsScrollContainer.style.transform = `translateY(${diffY}px)`;
             }
-          })
-          firstElement.addEventListener("touchend", () => {
-            isActive = !isActive;
-            newsScrollContainer.classList.toggle('top');
-            lentaWrapper.classList.toggle('hide');
-            newsScrollContainer.style.transform = `translateY(0px)`;
-            if (!newsScrollContainer.classList.contains('top')) {
-            document.body.style.overflow = 'auto';
           }
-          })
+          function touchEnd() {
+            isActive = !isActive;
+            newsScrollContainer.classList.toggle("top");
+            lentaContainer.classList.toggle("hide");
+            newsScrollContainer.style.transform = `translateY(0px)`;
+            if (!newsScrollContainer.classList.contains("top")) {
+              document.body.style.overflow = "auto";
+            }
+            if (newsScrollContainer.classList.contains("top")) {
+              firstElement.removeEventListener("touchstart", touchStart);
+              firstElement.removeEventListener("touchmove", touchMove);
+              firstElement.removeEventListener("touchend", touchEnd);
+            } else {
+              firstElement.addEventListener("touchstart", touchStart);
+              firstElement.addEventListener("touchmove", touchMove);
+              firstElement.addEventListener("touchend", touchEnd);
+            }
+            setTimeout(() => {
+              lentaLink.forEach((link) => {
+              if (!newsScrollContainer.classList.contains("top")) {
+                link.style.pointerEvents = "none";
+              } else {
+                link.style.pointerEvents = "auto";
+              }
+            });
+            }, 100);
+            
+          }
+          firstElement.addEventListener("touchstart", touchStart);
+          firstElement.addEventListener("touchmove", touchMove);
+          firstElement.addEventListener("touchend", touchEnd);
+
+          lentaWrapper.addEventListener("touchstart", touchStart);
+          lentaWrapper.addEventListener("touchmove", touchMove);
+          lentaWrapper.addEventListener("touchend", touchEnd);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("Ошибка при получении данных:", error);
         });
     }
