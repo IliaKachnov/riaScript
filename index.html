@@ -57,7 +57,7 @@
           width: 38px;
           border-radius: 3px;
           background-color: #d0d0d0;
-          margin-top: 7px;
+          margin-top: 10px;
           outline: none;
           border: none;
         }
@@ -82,6 +82,7 @@
           gap: 8px;
           margin: 12px 15px 18px;
           margin-bottom: 8px;
+          margin-top: 9px;
         }
         .time {
           float: left;
@@ -161,7 +162,7 @@
     <div class="container">
       <div class="scroll hide">
         <div class="line__wrapper">
-          <button class="line"></button>
+          <span class="line"></span>
         </div>
         <div class="lenta__wrapper hide">
           <p class="lenta">Лента новостей</p>
@@ -188,13 +189,11 @@
     let isActive = false;
 
     function fetchAndDisplayNews() {
-      console.log('запрос');
       fetch("https://6474014e7de100807b1a4b01.mockapi.io/ria")
         .then(response => response.json())
         .then(data => {
           const parsedData = data[0]
-          textWrapper.innerHTML = ""; // Очищаем предыдущий контент
-
+          textWrapper.innerHTML = "";
           if (parsedData.status === 'success') {
             parsedData.news.forEach(arr => {
               const textContainer = document.createElement('div');
@@ -265,14 +264,7 @@
             if(diffY > 80 - window.screen.availHeight) {
               newsScrollContainer.style.transform = `translateY(${diffY}px)`;
             }
-
           })
-          document.addEventListener('touchmove', function(event) {
-            if (window.scrollY === 0) {
-              event.preventDefault(); 
-            }
-          }, { passive: false }); 
-
           firstElement.addEventListener("touchend", () => {
             isActive = !isActive;
             newsScrollContainer.classList.toggle('top');
@@ -290,9 +282,5 @@
 
     fetchAndDisplayNews();
     setInterval(fetchAndDisplayNews, 60000);
-
-    
-
-   
   </script>
 </html>
